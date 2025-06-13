@@ -30,15 +30,16 @@ function MouthGuardModel({ mouthLandmarks, videoWidth, videoHeight, isMouthOpen 
       return;
     }
 
-    modelRef.current.visible = true;
+    // Only show mouthguard when mouth is open
+    modelRef.current.visible = isMouthOpen;
 
-    // Calculate mouth center from landmarks
+    // Calculate mouth center from landmarks - focusing on inner mouth area
     const leftCorner = mouthLandmarks[0]; // Leftmost point
     const rightCorner = mouthLandmarks[6]; // Rightmost point
-    const topPoint = mouthLandmarks[14]; // Top center of upper lip
-    const bottomPoint = mouthLandmarks[18]; // Bottom center of lower lip
+    const topPoint = mouthLandmarks[13]; // Upper inner lip center
+    const bottomPoint = mouthLandmarks[19]; // Lower inner lip center
 
-    // Calculate center position
+    // Calculate center position - bias towards inner mouth
     const centerX = (leftCorner.x + rightCorner.x) / 2;
     const centerY = (topPoint.y + bottomPoint.y) / 2;
 
@@ -47,23 +48,25 @@ function MouthGuardModel({ mouthLandmarks, videoWidth, videoHeight, isMouthOpen 
     const mouthHeight = Math.abs(bottomPoint.y - topPoint.y);
 
     // Convert to normalized coordinates (-1 to 1)
-    // Don't mirror X here since the canvas is already mirrored
-    const normalizedX = (centerX / videoWidth) * 2 - 1;
-    const normalizedY = -(centerY / videoHeight) * 2 + 1;
+    // Mirror X coordinate to match mirrored video
+    const normalizedX = -((centerX / videoWidth) * 2 - 1);
+    const normalizedY = -(centerY / videoHeight) * 2 + 1.1;
 
-    // Position the model
-    modelRef.current.position.set(normalizedX * 3, normalizedY * 3, 0);
+    // Position the model - precisely in the mouth center
+    modelRef.current.position.set(normalizedX * 1.8, normalizedY * 1.8, -0.05);
 
-    // Scale based on mouth size - made very small
-    const baseScale = 0.01; // Much smaller base scale
-    const widthScale = (mouthWidth / videoWidth) * 0.5; // Very small multiplier
-    const scale = baseScale * widthScale;
+    // Scale based on mouth size - made much smaller to fit inside mouth
+    const baseScale = 0.003; // Much smaller base scale
+    const widthScale = (mouthWidth / videoWidth) * 0.3; // Very small multiplier
+    const scale = Math.max(baseScale * widthScale, 0.0009); // Very small minimum scale
 
     modelRef.current.scale.set(scale, scale, scale);
 
-    // Calculate rotation based on mouth angle
+    // Calculate rotation based on mouth angle + 180 degree rotation
     const mouthAngle = Math.atan2(rightCorner.y - leftCorner.y, rightCorner.x - leftCorner.x);
-    modelRef.current.rotation.z = mouthAngle;
+    modelRef.current.rotation.z = -mouthAngle; // Add 180 degrees (π radians)
+    modelRef.current.rotation.y = 0; // Add 180 degrees (π radians)
+    modelRef.current.rotation.x =Math.PI; // Add 180 degrees (π radians)
   });
 
   return <primitive ref={modelRef} object={clonedScene} />;
@@ -93,10 +96,32 @@ const MouthOverlay = ({ mouthLandmarks, videoWidth, videoHeight, isMouthOpen }) 
         width: videoWidth,
         height: videoHeight,
         pointerEvents: "none",
-        transform: "scaleX(-1)", // Mirror to match video
         zIndex: 10,
       }}
     >
+      {/* Show "Open your mouth" text when mouth is closed */}
+      {/* {!isMouthOpen && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            color: "white",
+            fontSize: "24px",
+            fontWeight: "bold",
+            textAlign: "center",
+            textShadow: "2px 2px 4px rgba(0, 0, 0, 0.8)",
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            padding: "15px 25px",
+            borderRadius: "10px",
+            backdropFilter: "blur(5px)",
+          }}
+        >
+          Open your mouth
+        </div>
+      )} */}
+
       <Canvas
         camera={{
           position: [0, 0, 5],
@@ -135,6 +160,9 @@ const MouthOverlay = ({ mouthLandmarks, videoWidth, videoHeight, isMouthOpen }) 
             videoWidth={videoWidth}
             videoHeight={videoHeight}
             isMouthOpen={isMouthOpen}
+            style={{
+              backgroundColor: "red"
+            }}
           />
         </Suspense>
       </Canvas>
