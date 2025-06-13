@@ -11,7 +11,8 @@
       "Bash(rm:*)",
       "Bash(find:*)",
       "Bash(wget:*)",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:developers.snap.com)"
     ],
     "deny": []
   }
