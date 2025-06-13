@@ -58,7 +58,7 @@ function MouthGuardModel({ mouthLandmarks, videoWidth, videoHeight, isMouthOpen 
     // Scale based on mouth size - made much smaller to fit inside mouth
     const baseScale = 0.003; // Much smaller base scale
     const widthScale = (mouthWidth / videoWidth) * 0.3; // Very small multiplier
-    const scale = Math.max(baseScale * widthScale, 0.0009); // Very small minimum scale
+    const scale = Math.max(baseScale * widthScale, 0.001); // Very small minimum scale
 
     modelRef.current.scale.set(scale, scale, scale);
 
@@ -66,7 +66,7 @@ function MouthGuardModel({ mouthLandmarks, videoWidth, videoHeight, isMouthOpen 
     const mouthAngle = Math.atan2(rightCorner.y - leftCorner.y, rightCorner.x - leftCorner.x);
     modelRef.current.rotation.z = -mouthAngle; // Add 180 degrees (π radians)
     modelRef.current.rotation.y = 0; // Add 180 degrees (π radians)
-    modelRef.current.rotation.x =Math.PI; // Add 180 degrees (π radians)
+    modelRef.current.rotation.x = Math.PI; // Add 180 degrees (π radians)
   });
 
   return <primitive ref={modelRef} object={clonedScene} />;
@@ -161,7 +161,7 @@ const MouthOverlay = ({ mouthLandmarks, videoWidth, videoHeight, isMouthOpen }) 
             videoHeight={videoHeight}
             isMouthOpen={isMouthOpen}
             style={{
-              backgroundColor: "red"
+              backgroundColor: "red",
             }}
           />
         </Suspense>
