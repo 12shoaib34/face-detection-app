@@ -142,7 +142,7 @@ const ShareBottomSheet = ({ isOpen, onClose, capturedImage }) => {
     if (!canvasRef.current) return { x: 0, y: 0 };
     const rect = canvasRef.current.getBoundingClientRect();
     let clientX, clientY;
-    
+
     if (e.touches && e.touches.length > 0) {
       clientX = e.touches[0].clientX;
       clientY = e.touches[0].clientY;
@@ -150,7 +150,7 @@ const ShareBottomSheet = ({ isOpen, onClose, capturedImage }) => {
       clientX = e.clientX;
       clientY = e.clientY;
     }
-    
+
     const x = clientX - rect.left;
     const y = clientY - rect.top;
     return { x, y };
@@ -168,65 +168,8 @@ const ShareBottomSheet = ({ isOpen, onClose, capturedImage }) => {
     if (!isDrawing || !isDrawMode) return;
     e.preventDefault();
     const coords = getDrawCoordinates(e);
-    setCurrentPath(prev => [...prev, coords]);
+    setCurrentPath((prev) => [...prev, coords]);
   };
-
-  const stopDrawing = () => {
-    if (!isDrawing) return;
-    setIsDrawing(false);
-    if (currentPath.length > 1) {
-      setDrawPaths(prev => [...prev, currentPath]);
-    }
-    setCurrentPath([]);
-  };
-
-  useEffect(() => {
-    if (!canvasRef.current) return;
-    
-    const canvas = canvasRef.current;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width;
-    canvas.height = rect.height;
-    
-    const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    if (drawPaths.length === 0 && currentPath.length === 0) return;
-    
-    ctx.strokeStyle = 'white';
-    ctx.lineWidth = 3;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-    ctx.shadowBlur = 2;
-
-    // Draw all completed paths
-    drawPaths.forEach(path => {
-      if (path.length < 2) return;
-      ctx.beginPath();
-      path.forEach((point, index) => {
-        if (index === 0) {
-          ctx.moveTo(point.x, point.y);
-        } else {
-          ctx.lineTo(point.x, point.y);
-        }
-      });
-      ctx.stroke();
-    });
-
-    // Draw current path
-    if (currentPath.length > 1) {
-      ctx.beginPath();
-      currentPath.forEach((point, index) => {
-        if (index === 0) {
-          ctx.moveTo(point.x, point.y);
-        } else {
-          ctx.lineTo(point.x, point.y);
-        }
-      });
-      ctx.stroke();
-    }
-  }, [drawPaths, currentPath]);
 
   return (
     <div
@@ -276,20 +219,6 @@ const ShareBottomSheet = ({ isOpen, onClose, capturedImage }) => {
         )}
       </div>
 
-      {isOpen && (
-        <canvas
-          ref={canvasRef}
-          className={`draw-canvas ${isDrawMode ? 'active' : ''}`}
-          onMouseDown={startDrawing}
-          onMouseMove={draw}
-          onMouseUp={stopDrawing}
-          onMouseLeave={stopDrawing}
-          onTouchStart={startDrawing}
-          onTouchMove={draw}
-          onTouchEnd={stopDrawing}
-        />
-      )}
-
       <div className="sheet-header">
         <button className="close-button" onClick={onClose}>
           <FiX />
@@ -297,10 +226,10 @@ const ShareBottomSheet = ({ isOpen, onClose, capturedImage }) => {
       </div>
 
       <div className="right-panel">
-        <button className={`icon-button ${isTextMode ? 'active' : ''}`} onClick={handleTextClick}>
+        <button className={`icon-button ${isTextMode ? "active" : ""}`} onClick={handleTextClick}>
           <MdTextFields />
         </button>
-        <button className={`icon-button ${isDrawMode ? 'active' : ''}`} onClick={handleDrawClick}>
+        <button className={`icon-button ${isDrawMode ? "active" : ""}`} onClick={handleDrawClick}>
           <MdDraw />
         </button>
         <button className="icon-button" onClick={handleEffectClick}>

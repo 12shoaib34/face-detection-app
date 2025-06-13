@@ -6,6 +6,7 @@ import MouthOverlay from "./MouthOverlay/MouthOverlay";
 import ModelImagesPanel from "./ModelImagesPanel/ModelImagesPanel";
 import CameraFeedHeader from "./CameraFeedHeader/CameraFeedHeader";
 import ShareBottomSheet from "./ShareBottomSheet/ShareBottomSheet";
+import ThreeJsBackground from "./ThreeJsBackground/ThreeJsBackground";
 
 const FaceDetection = () => {
   const videoRef = useRef(null);
@@ -255,6 +256,7 @@ const FaceDetection = () => {
   if (showPermissionScreen) {
     return (
       <div className="face-detection-container">
+        <ThreeJsBackground />
         <div className="permission-screen">
           <div className="permission-content">
             <div className="logo-container">
@@ -272,6 +274,7 @@ const FaceDetection = () => {
 
   return (
     <div className="face-detection-container">
+      <ThreeJsBackground />
       <div className="camera-section">
         <div className="camera-wrapper">
           <CameraFeedHeader />
