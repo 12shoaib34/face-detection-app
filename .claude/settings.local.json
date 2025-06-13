@@ -7,7 +7,9 @@
       "Bash(npm run dev:*)",
       "Bash(npm run lint)",
       "Bash(cp:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(rm:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

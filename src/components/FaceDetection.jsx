@@ -18,6 +18,7 @@ const FaceDetection = () => {
   const [isMouthOpen, setIsMouthOpen] = useState(false);
   const [videoSize, setVideoSize] = useState({ width: 360, height: 640 });
   const [selectedModel, setSelectedModel] = useState(null);
+  
   const [selectedImage, setSelectedImage] = useState(null);
 
   const filters = [
@@ -37,7 +38,7 @@ const FaceDetection = () => {
     const loadModels = async () => {
       try {
         console.log("Starting to load models...");
-        // Comment out model loading for now
+        // Skip face detection model loading since we're using mock landmarks
         // await Promise.all([
         //   faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
         //   faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
@@ -110,108 +111,45 @@ const FaceDetection = () => {
 
     const detectInterval = setInterval(async () => {
       try {
-        // Comment out face detection for now
-        /*
-        const detections = await faceapi
-          .detectAllFaces(
-            video,
-            new faceapi.TinyFaceDetectorOptions({
-              inputSize: 416,
-              scoreThreshold: 0.5,
-            })
-          )
-          .withFaceLandmarks()
-          .withFaceExpressions();
-
-        if (detections.length > 0) {
+        // Create mock mouth landmarks positioned in the center of the video
+        // This will show the mouthguard without requiring face detection
+        if (selectedModel) {
+          const centerX = displaySize.width / 2;
+          const centerY = displaySize.height / 2;
+          const mouthWidth = 60;
+          const mouthHeight = 20;
+          
+          // Create mock mouth landmarks in the expected format
+          const mockMouthLandmarks = [
+            { x: centerX - mouthWidth/2, y: centerY }, // Left corner
+            { x: centerX - mouthWidth/3, y: centerY - mouthHeight/4 },
+            { x: centerX - mouthWidth/6, y: centerY - mouthHeight/2 },
+            { x: centerX, y: centerY - mouthHeight/2 },
+            { x: centerX + mouthWidth/6, y: centerY - mouthHeight/2 },
+            { x: centerX + mouthWidth/3, y: centerY - mouthHeight/4 },
+            { x: centerX + mouthWidth/2, y: centerY }, // Right corner
+            { x: centerX + mouthWidth/3, y: centerY + mouthHeight/4 },
+            { x: centerX + mouthWidth/6, y: centerY + mouthHeight/2 },
+            { x: centerX, y: centerY + mouthHeight/2 },
+            { x: centerX - mouthWidth/6, y: centerY + mouthHeight/2 },
+            { x: centerX - mouthWidth/3, y: centerY + mouthHeight/4 },
+            { x: centerX - mouthWidth/4, y: centerY - mouthHeight/3 }, // Inner lip points
+            { x: centerX - mouthWidth/8, y: centerY - mouthHeight/3 },
+            { x: centerX, y: centerY - mouthHeight/3 }, // Top center
+            { x: centerX + mouthWidth/8, y: centerY - mouthHeight/3 },
+            { x: centerX + mouthWidth/4, y: centerY - mouthHeight/3 },
+            { x: centerX + mouthWidth/4, y: centerY + mouthHeight/3 },
+            { x: centerX, y: centerY + mouthHeight/3 }, // Bottom center
+            { x: centerX - mouthWidth/4, y: centerY + mouthHeight/3 }
+          ];
+          
+          setMouthLandmarks(mockMouthLandmarks);
+          setIsMouthOpen(false); // Default to closed mouth
           setDetectionCount((prev) => prev + 1);
+        } else {
+          // Clear landmarks when no model is selected
+          setMouthLandmarks(null);
         }
-
-        const resizedDetections = faceapi.resizeResults(detections, displaySize);
-
-        const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Save context state
-        ctx.save();
-
-        // Apply mirror transform to match video
-        ctx.scale(-1, 1);
-        ctx.translate(-canvas.width, 0);
-
-        resizedDetections.forEach((detection) => {
-          const { landmarks } = detection;
-
-          // Get mouth landmarks for 3D overlay
-          const mouthPoints = landmarks.getMouth();
-          if (mouthPoints && mouthPoints.length > 0) {
-            setMouthLandmarks(mouthPoints);
-
-            // Calculate if mouth is open
-            const upperLip = mouthPoints.slice(13, 17); // Upper inner lip
-            const lowerLip = mouthPoints.slice(17, 20); // Lower inner lip
-
-            // Calculate average distance between upper and lower lip
-            let totalDistance = 0;
-            const numPoints = Math.min(upperLip.length, lowerLip.length);
-
-            for (let i = 0; i < numPoints; i++) {
-              const distance = Math.abs(lowerLip[i].y - upperLip[i].y);
-              totalDistance += distance;
-            }
-
-            const avgDistance = totalDistance / numPoints;
-            const mouthOpenThreshold = 5; // Lower threshold for testing
-
-            setIsMouthOpen(avgDistance > mouthOpenThreshold);
-            console.log(
-              "Mouth open distance:",
-              avgDistance,
-              "Threshold:",
-              mouthOpenThreshold,
-              "Is Open:",
-              avgDistance > mouthOpenThreshold
-            );
-          }
-
-          ctx.strokeStyle = "#00ff00";
-          ctx.lineWidth = 2;
-
-          const jawOutline = landmarks.getJawOutline();
-          const leftEyebrow = landmarks.getLeftEyeBrow();
-          const rightEyebrow = landmarks.getRightEyeBrow();
-          const noseBridge = landmarks.getNose();
-          const leftEye = landmarks.getLeftEye();
-          const rightEye = landmarks.getRightEye();
-          const outerLips = landmarks.getMouth();
-
-          const drawContour = (points, closed = false) => {
-            ctx.beginPath();
-            points.forEach((point, i) => {
-              if (i === 0) {
-                ctx.moveTo(point.x, point.y);
-              } else {
-                ctx.lineTo(point.x, point.y);
-              }
-            });
-            if (closed) {
-              ctx.closePath();
-            }
-            ctx.stroke();
-          };
-
-          drawContour(jawOutline);
-          drawContour(leftEyebrow);
-          drawContour(rightEyebrow);
-          drawContour(noseBridge);
-          drawContour(leftEye, true);
-          drawContour(rightEye, true);
-          drawContour(outerLips, true);
-        });
-
-        // Restore context state
-        ctx.restore();
-        */
       } catch (err) {
         console.error("Detection error:", err);
       }
@@ -247,6 +185,7 @@ const FaceDetection = () => {
               isMouthOpen={isMouthOpen}
             />
           )}
+          
 
           <ModelsSlider onModelSelect={setSelectedModel} />
 

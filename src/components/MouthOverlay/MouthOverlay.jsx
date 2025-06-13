@@ -22,11 +22,6 @@ function MouthGuardModel({ mouthLandmarks, videoWidth, videoHeight, isMouthOpen 
     return cloned;
   }, [scene]);
 
-  useEffect(() => {
-    console.log("Mouth Open:", isMouthOpen);
-    console.log("Mouth Landmarks:", mouthLandmarks?.length);
-  }, [isMouthOpen, mouthLandmarks]);
-
   useFrame(() => {
     if (!modelRef.current || !mouthLandmarks) {
       if (modelRef.current) {
@@ -35,7 +30,6 @@ function MouthGuardModel({ mouthLandmarks, videoWidth, videoHeight, isMouthOpen 
       return;
     }
 
-    // Temporarily always show for debugging
     modelRef.current.visible = true;
 
     // Calculate mouth center from landmarks
@@ -60,9 +54,9 @@ function MouthGuardModel({ mouthLandmarks, videoWidth, videoHeight, isMouthOpen 
     // Position the model
     modelRef.current.position.set(normalizedX * 3, normalizedY * 3, 0);
 
-    // Scale based on mouth size
-    const baseScale = 1;
-    const widthScale = (mouthWidth / videoWidth) * 20;
+    // Scale based on mouth size - made very small
+    const baseScale = 0.01; // Much smaller base scale
+    const widthScale = (mouthWidth / videoWidth) * 0.5; // Very small multiplier
     const scale = baseScale * widthScale;
 
     modelRef.current.scale.set(scale, scale, scale);
@@ -115,6 +109,7 @@ const MouthOverlay = ({ mouthLandmarks, videoWidth, videoHeight, isMouthOpen }) 
           width: "100%",
           height: "100%",
           background: "transparent",
+          pointerEvents: "none",
         }}
         gl={{
           alpha: true,

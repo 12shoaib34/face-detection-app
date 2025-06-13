@@ -72,6 +72,13 @@ const ModelsSlider = ({ onModelSelect }) => {
     }
   }, [selectedIndex]);
 
+  useEffect(() => {
+    // Auto-select the first model on mount
+    if (onModelSelect && models.length > 0) {
+      onModelSelect(models[0]);
+    }
+  }, []);
+
   const handleScroll = () => {
     if (!sliderRef.current) return;
 
@@ -183,7 +190,13 @@ const ModelsSlider = ({ onModelSelect }) => {
             key={model.id}
             ref={(el) => (itemRefs.current[index] = el)}
             className={`model ${index === selectedIndex ? "selected" : ""}`}
-            onClick={() => scrollToItem(index)}
+            onClick={() => {
+              setSelectedIndex(index);
+              if (onModelSelect) {
+                onModelSelect(model);
+              }
+              scrollToItem(index);
+            }}
           >
             <img src={model.images[model.previewImageIndex]} alt={model.name} className="model-image" />
             <span className="model-name">{model.name}</span>
