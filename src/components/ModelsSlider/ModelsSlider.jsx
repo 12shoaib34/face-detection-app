@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./ModelsSlider.css";
 
-const ModelsSlider = ({ onModelSelect }) => {
+const ModelsSlider = ({ onModelSelect, onCapture }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const sliderRef = useRef(null);
@@ -183,7 +183,13 @@ const ModelsSlider = ({ onModelSelect }) => {
             key={model.id}
             ref={(el) => (itemRefs.current[index] = el)}
             className={`model ${index === selectedIndex ? "selected" : ""}`}
-            onClick={() => scrollToItem(index)}
+            onClick={() => {
+              if (index === selectedIndex && onCapture) {
+                onCapture();
+              } else {
+                scrollToItem(index);
+              }
+            }}
           >
             <img src={model.images[model.previewImageIndex]} alt={model.name} className="model-image" />
             <span className="model-name">{model.name}</span>

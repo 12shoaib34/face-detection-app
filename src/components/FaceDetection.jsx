@@ -5,6 +5,7 @@ import ModelsSlider from "./ModelsSlider/ModelsSlider";
 import MouthOverlay from "./MouthOverlay/MouthOverlay";
 import ModelImagesPanel from "./ModelImagesPanel/ModelImagesPanel";
 import CameraFeedHeader from "./CameraFeedHeader/CameraFeedHeader";
+import ShareBottomSheet from "./ShareBottomSheet/ShareBottomSheet";
 
 const FaceDetection = () => {
   const videoRef = useRef(null);
@@ -19,6 +20,8 @@ const FaceDetection = () => {
   const [videoSize, setVideoSize] = useState({ width: 360, height: 640 });
   const [selectedModel, setSelectedModel] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [showShareSheet, setShowShareSheet] = useState(false);
+  const [capturedImage, setCapturedImage] = useState(null);
 
   const filters = [
     { id: "none", name: "None", color: "#666" },
@@ -82,6 +85,26 @@ const FaceDetection = () => {
       startVideo();
     }
   }, [isModelLoaded]);
+
+  const capturePhoto = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+
+    const video = videoRef.current;
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Set canvas size to match video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Draw the video frame to canvas
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Convert to data URL
+    const imageDataUrl = canvas.toDataURL('image/png');
+    setCapturedImage(imageDataUrl);
+    setShowShareSheet(true);
+  };
 
   const handleVideoPlay = () => {
     console.log("Video started playing");
@@ -248,9 +271,15 @@ const FaceDetection = () => {
             />
           )}
 
-          <ModelsSlider onModelSelect={setSelectedModel} />
+          <ModelsSlider onModelSelect={setSelectedModel} onCapture={capturePhoto} />
 
           {selectedModel && <ModelImagesPanel selectedModel={selectedModel} onImageSelect={setSelectedImage} />}
+          
+          <ShareBottomSheet 
+            isOpen={showShareSheet}
+            onClose={() => setShowShareSheet(false)}
+            capturedImage={capturedImage}
+          />
         </div>
       </div>
 
