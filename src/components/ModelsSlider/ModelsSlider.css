@@ -27,10 +27,15 @@
   display: flex;
   align-items: center;
   overflow-x: auto;
+  overflow-y: hidden;
   scroll-behavior: smooth;
   scrollbar-width: none;
   -ms-overflow-style: none;
   padding: 0 50%;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+  cursor: grab;
+  user-select: none;
 }
 
 .models-slider::-webkit-scrollbar {

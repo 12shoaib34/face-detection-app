@@ -3,8 +3,11 @@ import "./ModelsSlider.css";
 
 const ModelsSlider = ({ onModelSelect }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const sliderRef = useRef(null);
   const itemRefs = useRef([]);
+  const touchStartX = useRef(0);
+  const scrollStartX = useRef(0);
 
   // Placeholder models array
   const models = [
@@ -72,10 +75,68 @@ const ModelsSlider = ({ onModelSelect }) => {
     }
   };
 
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+    scrollStartX.current = sliderRef.current.scrollLeft;
+  };
+
+  const handleTouchMove = (e) => {
+    if (!sliderRef.current) return;
+
+    const touchDelta = touchStartX.current - e.touches[0].clientX;
+    sliderRef.current.scrollLeft = scrollStartX.current + touchDelta;
+  };
+
+  const handleTouchEnd = () => {
+    // The handleScroll function will take care of snapping to the nearest item
+  };
+
+  // Mouse event handlers for desktop
+  const handleMouseDown = (e) => {
+    setIsDragging(true);
+    touchStartX.current = e.clientX;
+    scrollStartX.current = sliderRef.current.scrollLeft;
+    sliderRef.current.style.cursor = 'grabbing';
+    e.preventDefault();
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDragging || !sliderRef.current) return;
+    
+    const mouseDelta = touchStartX.current - e.clientX;
+    sliderRef.current.scrollLeft = scrollStartX.current + mouseDelta;
+    e.preventDefault();
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    if (sliderRef.current) {
+      sliderRef.current.style.cursor = 'grab';
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setIsDragging(false);
+    if (sliderRef.current) {
+      sliderRef.current.style.cursor = 'grab';
+    }
+  };
+
   return (
     <div className="models-slider-container">
       <div className="center-frame"></div>
-      <div className="models-slider" ref={sliderRef} onScroll={handleScroll}>
+      <div
+        className="models-slider"
+        ref={sliderRef}
+        onScroll={handleScroll}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+      >
         <div className="slider-padding"></div>
         {models.map((model, index) => (
           <div
@@ -84,7 +145,9 @@ const ModelsSlider = ({ onModelSelect }) => {
             className={`model ${index === selectedIndex ? "selected" : ""}`}
             style={{ backgroundColor: model.color }}
             onClick={() => scrollToItem(index)}
-          ></div>
+          >
+            {/* <span className="model-name">{model.name}</span>  don't uncomment this line */}
+          </div>
         ))}
         <div className="slider-padding"></div>
       </div>
