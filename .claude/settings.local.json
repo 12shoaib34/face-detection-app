@@ -5,7 +5,9 @@
       "Bash(mkdir:*)",
       "Bash(ls:*)",
       "Bash(npm run dev:*)",
-      "Bash(npm run lint)"
+      "Bash(npm run lint)",
+      "Bash(cp:*)",
+      "Bash(pkill:*)"
     ],
     "deny": []
   }

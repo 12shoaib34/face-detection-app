@@ -9,16 +9,56 @@ const ModelsSlider = ({ onModelSelect }) => {
   const touchStartX = useRef(0);
   const scrollStartX = useRef(0);
 
-  // Placeholder models array
+  // Models array with preview images
   const models = [
-    { id: 1, name: "Model 1", color: "#FF6B6B" },
-    { id: 2, name: "Model 2", color: "#4ECDC4" },
-    { id: 3, name: "Model 3", color: "#45B7D1" },
-    { id: 4, name: "Model 4", color: "#96CEB4" },
-    { id: 5, name: "Model 5", color: "#DDA0DD" },
-    { id: 6, name: "Model 6", color: "#FFD93D" },
-    { id: 7, name: "Model 7", color: "#6C5CE7" },
-    { id: 8, name: "Model 8", color: "#A8E6CF" },
+    {
+      id: "t1",
+      name: "T1",
+      previewImage: "/T1/t1-1.imageset/t1-1-removebg-preview.png",
+      previewImageIndex: 2,
+
+      images: [
+        "/T1/t1-1.imageset/t1-1-removebg-preview.png",
+        "/T1/t1-2.imageset/t1-2-removebg-preview.png",
+        "/T1/t1-3.imageset/t1-3-removebg-preview.png",
+        "/T1/t1-4.imageset/t1-4-removebg-preview.png",
+        "/T1/t1-5.imageset/t1-5-removebg-preview.png",
+        "/T1/t1-6.imageset/t1-6-removebg-preview.png",
+        "/T1/t1-7.imageset/t1-7-removebg-preview.png",
+      ],
+    },
+    {
+      id: "t2",
+      name: "T2",
+      previewImage: "/T2/t2-1.imageset/t2-1-removebg-preview.png",
+      previewImageIndex: 5,
+
+      images: [
+        "/T2/t2-1.imageset/t2-1-removebg-preview.png",
+        "/T2/t2-2.imageset/t2-2-removebg-preview.png",
+        "/T2/t2-3.imageset/t2-3-removebg-preview.png",
+        "/T2/t2-4.imageset/t2-4-removebg-preview.png",
+        "/T2/t2-5.imageset/t2-5-removebg-preview.png",
+        "/T2/t2-6.imageset/t2-6-removebg-preview.png",
+        "/T2/t2-7.imageset/t2-7-removebg-preview.png",
+      ],
+    },
+    {
+      id: "vipa",
+      name: "Vipa",
+      previewImage: "/Vipa/vipa-1.imageset/vipa-1-removebg-preview.png",
+      previewImageIndex: 5,
+
+      images: [
+        "/Vipa/vipa-1.imageset/vipa-1-removebg-preview.png",
+        "/Vipa/vipa-2.imageset/vipa-2-removebg-preview.png",
+        "/Vipa/vipa-3.imageset/vipa-3-removebg-preview.png",
+        "/Vipa/vipa-4.imageset/vipa-4-removebg-preview.png",
+        "/Vipa/vipa-5.imageset/vipa-5-removebg-preview.png",
+        "/Vipa/vipa-6.imageset/vipa-6-removebg-preview.png",
+        "/Vipa/vipa-7.imageset/vipa-7-removebg-preview.png",
+      ],
+    },
   ];
 
   useEffect(() => {
@@ -96,13 +136,13 @@ const ModelsSlider = ({ onModelSelect }) => {
     setIsDragging(true);
     touchStartX.current = e.clientX;
     scrollStartX.current = sliderRef.current.scrollLeft;
-    sliderRef.current.style.cursor = 'grabbing';
+    sliderRef.current.style.cursor = "grabbing";
     e.preventDefault();
   };
 
   const handleMouseMove = (e) => {
     if (!isDragging || !sliderRef.current) return;
-    
+
     const mouseDelta = touchStartX.current - e.clientX;
     sliderRef.current.scrollLeft = scrollStartX.current + mouseDelta;
     e.preventDefault();
@@ -111,14 +151,14 @@ const ModelsSlider = ({ onModelSelect }) => {
   const handleMouseUp = () => {
     setIsDragging(false);
     if (sliderRef.current) {
-      sliderRef.current.style.cursor = 'grab';
+      sliderRef.current.style.cursor = "grab";
     }
   };
 
   const handleMouseLeave = () => {
     setIsDragging(false);
     if (sliderRef.current) {
-      sliderRef.current.style.cursor = 'grab';
+      sliderRef.current.style.cursor = "grab";
     }
   };
 
@@ -143,10 +183,10 @@ const ModelsSlider = ({ onModelSelect }) => {
             key={model.id}
             ref={(el) => (itemRefs.current[index] = el)}
             className={`model ${index === selectedIndex ? "selected" : ""}`}
-            style={{ backgroundColor: model.color }}
             onClick={() => scrollToItem(index)}
           >
-            {/* <span className="model-name">{model.name}</span>  don't uncomment this line */}
+            <img src={model.images[model.previewImageIndex]} alt={model.name} className="model-image" />
+            <span className="model-name">{model.name}</span>
           </div>
         ))}
         <div className="slider-padding"></div>

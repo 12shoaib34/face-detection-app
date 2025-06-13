@@ -35,6 +35,7 @@
   height: 100%;
   transform: scaleX(-1);
   pointer-events: none;
+  z-index: 1;
 }
 
 .loading-overlay {
