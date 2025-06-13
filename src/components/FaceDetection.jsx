@@ -22,6 +22,7 @@ const FaceDetection = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [showShareSheet, setShowShareSheet] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
+  const [showPermissionScreen, setShowPermissionScreen] = useState(true);
 
   const filters = [
     { id: "none", name: "None", color: "#666" },
@@ -58,33 +59,38 @@ const FaceDetection = () => {
     loadModels();
   }, []);
 
-  useEffect(() => {
-    const startVideo = async () => {
-      try {
-        console.log("Requesting camera access...");
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: "user",
-            width: { ideal: 360 },
-            height: { ideal: 640 },
-          },
-          audio: false,
-        });
+  const startVideo = async () => {
+    try {
+      console.log("Requesting camera access...");
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: "user",
+          width: { ideal: 360 },
+          height: { ideal: 640 },
+        },
+        audio: false,
+      });
 
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          console.log("Camera stream attached to video element");
-        }
-      } catch (error) {
-        console.error("Error accessing camera:", error);
-        setError("Failed to access camera");
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        console.log("Camera stream attached to video element");
       }
-    };
+    } catch (error) {
+      console.error("Error accessing camera:", error);
+      setError("Failed to access camera. Please grant camera permission.");
+    }
+  };
 
-    if (isModelLoaded) {
+  useEffect(() => {
+    if (isModelLoaded && !showPermissionScreen) {
       startVideo();
     }
-  }, [isModelLoaded]);
+  }, [isModelLoaded, showPermissionScreen]);
+
+  const handleStartClick = async () => {
+    setShowPermissionScreen(false);
+    await startVideo();
+  };
 
   const capturePhoto = () => {
     if (!videoRef.current || !canvasRef.current) return;
@@ -245,6 +251,24 @@ const FaceDetection = () => {
       clearInterval(detectInterval);
     };
   };
+
+  if (showPermissionScreen) {
+    return (
+      <div className="face-detection-container">
+        <div className="permission-screen">
+          <div className="permission-content">
+            <div className="logo-container">
+              <img src="/rebel-logo.svg" alt="Rebel Logo" className="permission-logo" />
+              <h2 className="virtual-trial-text">Virtual try on</h2>
+            </div>
+            <button className="start-button" onClick={handleStartClick}>
+              Start
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="face-detection-container">
